@@ -1,4 +1,4 @@
-# Airline scheduling problem (ASP)
+# aux_Airline scheduling problem (aux_ASP)
 
 ###############################################################
 #                          Constants                          #
@@ -43,8 +43,8 @@ planes = [
 ###############################################################
 
 # Air time
-time_1 = planes(1,2) ./ distance;
-time_2 = planes(2,2) ./ distance;
+time_1 = distance ./ planes(1,2);
+time_2 = distance ./ planes(2,2);
 
 time = zeros(size(time_1,1), size(time_1,2), 2);
 
@@ -79,11 +79,10 @@ capacity = planes(:,1);
 # Minimum number of flights
 min_flights = [0 1 0 0; 1 0 1 1; 0 1 0 0; 0 1 0 0];
 
-# Number of aircraft of type k
-aircraft = [3,3];
-
+###############################################################
 ###############################################################
 #                           Solver                            #
+###############################################################
 ###############################################################
 
 # GLPK
@@ -101,8 +100,12 @@ flatten(~isfinite(flatten)) = 0;
 flatten_mins = flatten(flatten > 0);
 
 A = [];
-b = vertcat(flatten_dem, flatten_mins)'(:)';
+aux_b = vertcat(flatten_dem, flatten_mins)'(:)';
 ctype = {};
+
+###############################################################
+#                     Demand constraints                      #
+###############################################################
 
 for i = 1:size(flatten_dem,2)
     aux = zeros(1, size(flatten_costs,2));
@@ -112,8 +115,9 @@ for i = 1:size(flatten_dem,2)
     ctype = vertcat(ctype, 'L');
 endfor;
 
-# The next should be commented or deleted, it is just for testing
-% A = [];
+###############################################################
+#            Minimum number of flights constraints            #
+###############################################################
 
 for i = 1:size(flatten_mins,2)
     aux = zeros(1, size(flatten_costs,2));
@@ -123,45 +127,79 @@ for i = 1:size(flatten_mins,2)
     ctype = vertcat(ctype, 'L');
 endfor;
 
-# The next should be commented or deleted, it is just for testing
-% A = [];
-
-needed_utilization = planes(:,4) .* aircraft';
+###############################################################
+#               Aircraft usage time constraints               #
+###############################################################
 
 flatten = time(:,:,1)(:)';
 flatten(~isfinite(flatten)) = 0;
-flatten_time = flatten(flatten > 0);
+flatten_time_1 = flatten(flatten > 0);
 
-flatten_time = vertcat(flatten_time, zeros(1, size(flatten_time, 2)))'(:)';
-
-A = vertcat(A, flatten_time);
-b(end + 1) = needed_utilization(1);
-ctype = vertcat(ctype, 'U');
+flatten_time_1 = vertcat(
+    flatten_time_1,
+    zeros(1, size(flatten_time_1, 2)))'(:)';
 
 flatten = time(:,:,2)(:)';
 flatten(~isfinite(flatten)) = 0;
-flatten_time = flatten(flatten > 0);
+flatten_time_2 = flatten(flatten > 0);
 
-flatten_time = vertcat(zeros(1, size(flatten_time, 2)), flatten_time)'(:)';
+flatten_time_2 = vertcat(
+    zeros(1, size(flatten_time_2, 2)),
+    flatten_time_2)'(:)';
 
-A = vertcat(A, flatten_time);
-b(end + 1) = needed_utilization(2);
-ctype = vertcat(ctype, 'U');
+A = vertcat(A, flatten_time_1);
+A = vertcat(A, flatten_time_2);
 
-sense = 1;
-ctype = cell2mat(ctype);
+###############################################################
+#                       Loop constants                        #
+###############################################################
 
 lower_boundary = zeros(1, size(flatten_costs,2));
 upper_boundary = Inf(1, size(flatten_costs,2));
 vtype = repmat('I', 1, size(flatten_costs,2));
+ctype = vertcat(ctype, 'U');
+ctype = vertcat(ctype, 'U');
+ctype = cell2mat(ctype);
 
-[xopt,zmx] = glpk(
-    flatten_costs,
-    A,
-    b,
-    lower_boundary,
-    upper_boundary,
-    ctype,
-    vtype,
-    sense
-);
+permutation = [];
+min_costs = Inf;
+aircraft_x = [];
+aircraft_y = [];
+
+###############################################################
+#             Find best combinations of aircrafts             #
+###############################################################
+
+result = [];
+brute_profit = sum(sum(fare .* demand))
+
+for x = 0:3
+    for y = 0:3
+        needed_utilization = planes(:,4) .* [x y]';
+
+        b = aux_b;
+        b(end + 1) = needed_utilization(1);
+        b(end + 1) = needed_utilization(2);
+
+        sense = 1;
+
+        [xopt,zmx] = glpk(
+            flatten_costs,
+            A,
+            b,
+            lower_boundary,
+            upper_boundary,
+            ctype,
+            vtype,
+            sense
+        );
+
+        if isfinite(zmx)
+            result = vertcat(result,[(brute_profit - zmx) x y]);
+            if zmx < min_costs
+                min_costs = zmx;
+                permutation = xopt;
+            endif;
+        endif;
+    endfor;
+endfor;
