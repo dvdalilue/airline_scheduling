@@ -37,6 +37,9 @@
 \fancyhead[R]{\color{pgrey}\textsc{{\footnotesize \leftmark}}\ $|$ \color{black} \marginnote{\thepage}}
 \fancyfoot[R]{\color{pgrey}\footnotesize Universidad Politécnica de Madrid}
 
+\renewcommand\spanishtablename{Tabla}
+\renewcommand*\spanishlisttablename{Índice de tablas}
+
 \begin{document}
 
 % Title
@@ -76,7 +79,9 @@
 
 \section{Introducción}
 
-\lipsum[1-2]
+Este trabajo tiene como objetivo buscar la solución óptima a un problema que plantea condiciones y restricciones para programar los vuelos de una aerolínea. Este problema se enfoca en un grupo finito de ciudades y distintos tipos de aeronaves, estas condiciones nos brindan la materia prima para empezar a crear un modelo en el que se pueda aplicar algún método de programación lineal. En principio se habla un poco de que nos permite la programación lineal, los elementos que la conforman y los puntos de vista que puede tener. Posteriormente se enuncia el problema a resolver, así como los datos que brinda una aerolínea ficticia con el objetivo de maximizar sus ganancias.
+
+Hay una sección dedicada al modelo planteado para abordar a este problema, la variables y constantes que lo conforman. Además de eso, se formalizan las restricciones necesarias para encerrar el espacio de búsqueda, por lo tanto el método numérico que se use podrá hallar la solución óptima. Este acordonamiento de las soluciones es el resultado de condiciones sujetas a las demandas de la aerolínea y tienen una sección para explicarlas. Finalizando, se pueden ver progresivamente los distintos resultados obtenidos en conjunto con una breve interpretación, permitiendo terminar con una conclusión del trabajo.
 
 \newpage
 
@@ -199,7 +204,7 @@ Obviamente existe un costo por el uso de las aeronaves y tomando en consideraci�
     \sum_{i,j}\sum_{k} N_{ijk}.C_{ijk}
 \end{equation}
 
-Donde $C_{ijk}$ es el costo de volar desde $i$ hasta $j$ usando la aeronave $k$. Los valores de esta matriz de 3 dimensiones se pueden deducir usando la distancia entre dos ciudades, el tiempo que demora cada aeronave y el costo de uso. Dejando el siguiente cuadro como resultado en el caso de la primera aeronave.
+Donde $C_{ijk}$ es el costo de volar desde $i$ hasta $j$ usando la aeronave $k$. Los valores de esta matriz de 3 dimensiones se pueden deducir usando la distancia entre dos ciudades, el tiempo que demora cada aeronave (ver tablas \ref{tab:tij1} y \ref{tab:tij2}) y el costo de uso. Dejando el siguiente cuadro como resultado en el caso de la primera aeronave.
 
 \begin{table}[h!]
     \centering
@@ -208,10 +213,10 @@ Donde $C_{ijk}$ es el costo de volar desde $i$ hasta $j$ usando la aeronave $k$.
                &   1  &   2  &   3  &   4\\
             \hline
             \hline
-              1 &      0 &  2846.2 &       0 &       0\\
-              2 & 2846.2 &       0 &  1973.3 &  2387.1\\
-              3 &      0 &  1973.3 &       0 &       0\\
-              4 &      0 &  2387.1 &       0 &       0\\
+              1 &          0 &  1202.5  &          0  &          0\\
+              2 & 1202.5 &           0  & 1734.4  & 1433.8\\
+              3 &          0 &  1734.4  &          0  &          0\\
+              4 &          0 &  1433.8  &          0  &          0\\
     \end{tabular}
     \caption{Costo de volar de i a j con el avión 1}
     \label{tab:cij1}
@@ -226,10 +231,10 @@ Y si usamos la segunda aeronave quedaría de la siguiente manera.
                &   1  &   2  &   3  &   4\\
             \hline
             \hline
-              1 &      0  & 6211.5  &      0  &      0\\
-              2 & 6211.5  &      0  & 4306.7  & 5209.7\\
-              3 &      0  & 4306.7  &      0  &      0\\
-              4 &      0  & 5209.7  &      0  &      0\\
+              1 &      0 &  2324.7 &       0 &       0\\
+              2 & 2324.7 &       0 &  3352.9 &  2771.8\\
+              3 &      0 &  3352.9 &       0 &       0\\
+              4 &      0 &  2771.8 &       0 &       0\\
     \end{tabular}
     \caption{Costo de volar de i a j con el avión 2}
     \label{tab:cij2}
@@ -268,10 +273,10 @@ Donde $U_k$ es el tiempo de uso máximo de cada avión, este se puede ver en el 
                &   1  &   2  &   3  &   4\\
             \hline
             \hline
-             1 &      0  & 1.5385  &      0  &      0\\
-             2 & 1.5385  &      0  & 1.0667  & 1.2903\\
-             3 &      0  & 1.0667  &      0  &      0\\
-             4 &      0  & 1.2903  &      0  &      0\\
+             1 &       0  & 0.65000  &       0  &       0\\
+             2 & 0.65000  &       0  & 0.93750  & 0.77500\\
+             3 &       0  & 0.93750  &       0  &       0\\
+             4 &       0  & 0.77500  &       0  &       0\\
     \end{tabular}
     \caption{Tiempo de volar de i a j con el avión 1}
     \label{tab:tij1}
@@ -284,10 +289,10 @@ Donde $U_k$ es el tiempo de uso máximo de cada avión, este se puede ver en el 
                &   1  &   2  &   3  &   4\\
             \hline
             \hline
-             1 &      0  & 1.6346  &      0  &      0\\
-             2 & 1.6346  &      0  & 1.1333  & 1.3710\\
-             3 &      0  & 1.1333  &      0  &      0\\
-             4 &      0  & 1.3710  &      0  &      0\\
+             1 &       0  & 0.61176  &       0  &       0\\
+             2 & 0.61176  &       0  & 0.88235  & 0.72941\\
+             3 &       0  & 0.88235  &       0  &       0\\
+             4 &       0  & 0.72941  &       0  &       0\\
     \end{tabular}
     \caption{Tiempo de volar de i a j con el avión 2}
     \label{tab:tij2}
@@ -354,7 +359,7 @@ Se quieren resaltar dos de los resultados obtenidos. El primero es (b), se puede
 \begin{table}[ht!]
     \centering
     \begin{tabular}{r|r|r|r|r}
-        $N_{ij1}$%
+        $N_{ij2}$%
                &   1  &   2  &   3  &   4\\
             \hline
             \hline
@@ -388,7 +393,7 @@ En el caso de (a), los valores de $N_{ijk}$ quedarían de la siguiente manera.
 \begin{table}[ht!]
     \centering
     \begin{tabular}{r|r|r|r|r}
-        $N_{ij1}$%
+        $N_{ij2}$%
                &   1  &   2  &   3  &   4\\
             \hline
             \hline
@@ -400,5 +405,11 @@ En el caso de (a), los valores de $N_{ijk}$ quedarían de la siguiente manera.
     \caption{Mejor distribución de vuelos para el avión 2 (a)}
     \label{tab:nij2a}
 \end{table}
+
+\section{Conclusiones}
+
+Después de elaborar una solución a través de la programación lineal se puede ver el poder que tienen estos métodos para resolver problemas de optimización. Muchos de estos problemas representan escenarios de la vida real, logrando usar un programa matemático en distintos tipos de empresas para mejorar diferentes aspectos que se puedan modelar. En concreto, el problema de la programación de vuelos puede presentar variantes pero en este trabajo se pudo establecer un criterio para una solución óptima y al final sigue dependiendo factores ajenos al modelo implementado. Es importante dar una interpretación adecuada a los resultados, o restringir aun más el espacio de solución para ajustar el modelo.
+
+El uso de herramientas adecuadas también es importante porque permite elaborar una solución de manera sencilla, ya que se ha desarrollado para ello; computación numérica. Brinda la posibilidad de enfocar exclusivamente a manejar los datos y ofrece funcionalidades que, sabiendo usarlas de manera inteligente, pueden aplicarse distintos problemas. No solo hay que saber usar las herramientas, sino la teoría que las ha fundamentado.hay que saber usar las herramientas, sino la teoría que las ha fundamentado.
 
 \end{document}
